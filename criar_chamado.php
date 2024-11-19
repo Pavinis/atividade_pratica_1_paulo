@@ -1,7 +1,7 @@
 <?php
 include 'db_connect.php';
 
-// Adicionar novo cliente
+// Adicionar novo chamado
 if (isset($_POST["adicionar"])) {
     $cliente = $_POST['fk_cliente'];
     $descricao = $_POST['descricao_chamado'];
@@ -10,7 +10,7 @@ if (isset($_POST["adicionar"])) {
 
     $sql = "INSERT INTO chamados (fk_cliente, descricao_chamado, criticidade_chamado, status_chamado) VALUES (?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param('ssss', $cliente, $descricao, $criticidade, $status);
+    $stmt->bind_param('isss', $cliente, $descricao, $criticidade, $status);
 
     if ($stmt->execute()) {
         echo "Novo chamado registrado com sucesso!";
@@ -27,7 +27,10 @@ $result = $conn->query($sql);
 
 //exibindo tabela chamados
 if ($result->num_rows > 0) {
-    echo "<table border='1'>
+    echo "<div class='column'>
+            <div class='row'>
+            <div class='column'>
+            <table border='1'>
             <tr>
                 <th>ID do Cliente</th>
                 <th>ID do Chamado</th>
@@ -47,11 +50,11 @@ if ($result->num_rows > 0) {
                 <td>{$row['nome_cliente']}</td>
                 <td>
                     <form method='POST' action=''>
-                        <input type='hidden' name='id_cliente' value='{$row['id_cliente']}'>
+                        <input type='hidden' name='id_chamado' value='{$row['id_chamado']}'>
                         <input type='submit' name='delete' value='Deletar Dados'>
                     </form>
                     <form method='POST' action=''>
-                        <input type='hidden' name='id_cliente' value='{$row['id_cliente']}'>
+                        <input type='hidden' name='id_chamado' value='{$row['id_chamado']}'>
                         <input type='submit' name='alterar' value='Alterar Dados'>
                     </form>
                 </td>
@@ -86,9 +89,9 @@ if (isset($_POST["alterar"])) {
     <br>===/ALTERANDO VALORES\===
     <br>
     <br>";
-    $id_update = $_POST["id_cliente"];
+    $id_update = $_POST["id_chamado"];
 
-    $sql_select = "SELECT * FROM clientes WHERE id_cliente = ?";
+    $sql_select = "SELECT * FROM chamados WHERE id_chamado = ?";
     $stmt_select = $conn->prepare($sql_select);
     $stmt_select->bind_param('i', $id_update);
     $stmt_select->execute();
@@ -97,15 +100,27 @@ if (isset($_POST["alterar"])) {
     if ($row = $result_select->fetch_assoc()) {
         echo "
         <form method='POST' action=''>
-            <input type='hidden' name='id_cliente' value='{$row['id_cliente']}'>
-            <label for='nome'>Nome do Cliente: </label>
-            <input type='text' name='nome' value='{$row['nome_cliente']}' required><br>
+            <input type='hidden' name='id_chamado' value='{$row['id_chamado']}'>
 
-            <label for='email'>E-Mail: </label>
-            <input type='email' name='email' value='{$row['email_cliente']}' required><br>
+            <label for='fk_cliente'>Id do Cliente: </label>
+            <input type='number' name='fk_cliente' value='{$row['fk_cliente']}' required><br>
 
-            <label for='telefone'>Telefone: </label>
-            <input type='text' name='telefone' value='{$row['telefone_cliente']}' required><br>
+            <label for='descricao_chamado'>Descrição: </label>
+            <input type='text' name='descricao_chamado' value='{$row['descricao_chamado']}' required><br>
+
+            <label for='criticidade_chamado'>Criticidade: </label>
+            <select name='criticidade_chamado' required>
+                <option value='baixa'>baixa</option>
+                <option value='média'>média</option>
+                <option value='alta'>alta</option>
+            </select><br>
+
+            <label for='status_chamado'>Status: </label>
+            <select name='status_chamado' required>
+                <option value='aberto'>aberto</option>
+                <option value='em andamento'>em andamento</option>
+                <option value='resolvido'>resolvido</option>
+            </select><br>
 
             <input type='submit' name='salvar_alteracoes' value='Salvar Alterações'>
         </form>";
@@ -122,22 +137,23 @@ if (isset($_POST["alterar"])) {
 
 // Salvar alterações do cliente
 if (isset($_POST["salvar_alteracoes"])) {
-    $id_cliente = $_POST['id_cliente'];
-    $nome = $_POST['nome'];
-    $email = $_POST['email'];
-    $telefone = $_POST['telefone'];
+    $id_chamado = $_POST['id_chamado'];
+    $cliente = $_POST['fk_cliente'];
+    $descricao = $_POST['descricao_chamado'];
+    $criticidade = $_POST['criticidade_chamado'];
+    $status = $_POST['status_chamado'];
 
-    $sql_update = "UPDATE clientes SET nome_cliente = ?, email_cliente = ?, telefone_cliente = ? WHERE id_cliente = ?";
+    $sql_update = "UPDATE chamados SET fk_cliente = ?, descricao_chamado = ?, criticidade_chamado = ?, status_chamado = ? WHERE id_chamado = ?";
     $stmt_update = $conn->prepare($sql_update);
-    $stmt_update->bind_param('sssi', $nome, $email, $telefone, $id_cliente);
+    $stmt_update->bind_param('isssi', $cliente, $descricao, $criticidade, $status, $id_chamado);
 
     if ($stmt_update->execute()) {
-        echo "Dados do cliente atualizados com sucesso!";
+        echo "Dados do chamado atualizados com sucesso!";
     } else {
-        echo "Erro ao atualizar os dados do cliente.";
+        echo "Erro ao atualizar os dados do chamado.";
     }
 
-    header("Location: criar_cliente.php");
+    header("Location: criar_chamado.php");
     exit();
 }
 
@@ -150,8 +166,16 @@ $result = $stmt->get_result();
 $conn->close();
 
 ?>
-
-<form method="POST" action="criar_cliente.php">
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chamados</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!--o começo das divs se encontra na parte do php -->    
+<form method="POST" action="criar_chamado.php">
     Cliente id: <input type="number" name="fk_cliente" required>
 
     Descrição: <input type="text" name="descricao_chamado" required>
@@ -171,5 +195,11 @@ $conn->close();
     </select>
     <input type="submit" name="adicionar">
 </form>
-
-<a href="criar_cliente"><button>Adicionar cliente</button></a>
+<div class='row'>
+<a href="criar_cliente.php"><button>Adicionar cliente</button></a>
+</div>
+</div>
+</div>
+</div>
+</body>
+</html>

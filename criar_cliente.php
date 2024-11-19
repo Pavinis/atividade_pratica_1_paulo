@@ -24,7 +24,10 @@ $result = $conn->query($sql);
 
 //exibindo tabela clientes
 if ($result->num_rows > 0) {
-    echo "<table border='1'>
+    echo "<div class='column'>
+            <div class='row'>
+            <div class='column'>
+            <table border='1'>
             <tr>
                 <th>ID do Cliente</th>
                 <th>Nome do Cliente</th>
@@ -138,12 +141,26 @@ $conn->close();
 
 
 ?>
-
-<form method="POST" action="criar_cliente.php">
-    Nome: <input type="text" name="nome_cliente" required>
-    email: <input type="email" name="email_cliente" required>
-    telefone: <input type="text" name="telefone_cliente" required>
-    <input type="submit" name="adicionar">
-</form>
-
-<a href="criar_chamado"><button>Adicionar chamado</button></a>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!--o começo das divs se encontra na parte do php -->    
+            <form method="POST" action="criar_cliente.php">
+                Nome: <input type="text" name="nome_cliente" required>
+                email: <input type="email" name="email_cliente" required>
+                telefone: <input type="text" name="telefone_cliente" required>
+                <input type="submit" name="adicionar">
+            </form>
+            <div class='row'>
+            <a href="criar_chamado.php"><button>Adicionar chamado</button></a>
+            </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
